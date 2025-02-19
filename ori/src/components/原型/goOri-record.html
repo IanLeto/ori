@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Script Load Test</title>
+    <!-- 引入 Element UI 样式 -->
+    <link rel="stylesheet" href="/node_modules/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<h1>Script Load Test</h1>
+<!-- 引入 Vue 和 Element UI -->
+<script src="/node_modules/vue/dist/vue.js"></script>
+<script src="/node_modules/element-ui/lib/index.js"></script>
+<p id="status">Checking scripts...</p>
+
+<!-- Vue 绑定的 UI -->
+<div id="app">
+    <el-button @click="visible = true">Open Dialog</el-button>
+    <el-dialog :visible.sync="visible" title="Hello world">
+        <p>Try Element UI</p>
+    </el-dialog>
+</div>
+
+<script type="module">
+    import('/src/main.js')
+        .then(() => console.log('✅ /src/main.js loaded successfully'))
+        .catch(error => console.error('❌ Error loading /src/main.js:', error));
+</script>
+
+<script>
+    function checkLibrary(name, globalVar) {
+        if (window[globalVar]) {
+            console.log(`✅ ${name} loaded successfully`);
+            return `${name} loaded successfully`;
+        } else {
+            console.error(`❌ Failed to load ${name}`);
+            return `Failed to load ${name}`;
+        }
+    }
+
+    window.onload = function () {
+        const results = [
+            checkLibrary('Vue', 'Vue'),
+            checkLibrary('Element UI', 'ELEMENT')
+        ];
+        document.getElementById('status').innerHTML = results.join('<br>');
+
+        if (window.Vue && window.ELEMENT) {
+            new Vue({
+                el: '#app',
+                data: function () {
+                    return {visible: false}
+                }
+            });
+        }
+    };
+</script>
+
+
+</body>
+</html>
