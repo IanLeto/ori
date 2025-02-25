@@ -1,0 +1,30 @@
+{
+  "_comment": {
+    "name": "名称，例如物品、项目或记录名称",
+    "weight": "权重或某种衡量标准，可能用于计算或排序",
+    "is_fuck": "是否启用某种特定行为（建议更改字段名为 is_active 以避免不适当的用词）",
+    "vol1": "体积参数 1，可能代表尺寸或容量",
+    "vol2": "体积参数 2，可能代表不同维度的体积",
+    "vol3": "体积参数 3，可能用于额外体积信息",
+    "vol4": "体积参数 4，可能用于计算或存储额外信息",
+    "content": "主要内容或描述信息",
+    "cost": "成本，可能是某个项目或商品的价格",
+    "retire": "退役时间或者某个资源的过期时间",
+    "dev": "开发相关信息，如开发者或设备信息",
+    "coding": "编码信息，可能是某种标识符或代码",
+    "social": "社交相关信息，可能涉及社交媒体或联系人"
+  },
+  "name": "Sample Item",
+  "weight": 12.5,
+  "is_fuck": true,
+  "vol1": "10cm",
+  "vol2": "20cm",
+  "vol3": "30cm",
+  "vol4": "40cm",
+  "content": "This is a sample content description.",
+  "cost": 100,
+  "retire": 2025,
+  "dev": "Development Team",
+  "coding": "UTF-8",
+  "social": "@sample_handle"
+}
