@@ -1,0 +1,30 @@
+{
+  "_comment": {
+    "time": "交易时间（格式：YYYY-MM-DD HH:MM:SS）",
+    "intf": "接口名称",
+    "az": "可用区（availability zone）",
+    "svc_name": "服务名称",
+    "trans_type": "交易类型（如：0922-存量信贷信息）",
+    "trans_type_code": "交易类型代码",
+    "trans_channel": "交易渠道代码",
+    "ret_code": "返回码（如：CFC1991）",
+    "trans_count": "交易总次数",
+    "succ_count": "成功交易次数",
+    "resp_time": "响应时间（单位：毫秒）",
+    "resp_count": "响应总次数",
+    "succ_p": "成功率（1 表示 100%）"
+  },
+  "time": "2018-09-06 15:00:00",
+  "intf": "cpaas",
+  "az": "az1",
+  "svc_name": "poin",
+  "trans_type": "0922-存量信贷信息",
+  "trans_type_code": "0922",
+  "trans_channel": "1110",
+  "ret_code": "CFC1991",
+  "trans_count": 1,
+  "succ_count": 0,
+  "resp_time": 0,
+  "resp_count": 1,
+  "succ_p": 1
+}
