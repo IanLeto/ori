@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动态多选框表单</title>
+    <link rel="stylesheet" href="/node_modules/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-main>
+            <el-collapse v-model="activeNames">
+                <el-collapse-item v-for="item in transData" :key="item.key" :name="item.key">
+                    <template slot="title">
+                        {{ item.trans_name }} - {{ item.trans_type }} ({{ item.trans_channel }})
+                    </template>
+
+                    <!-- 多选框组 -->
+                    <el-checkbox-group v-model="selectedOptions[item.key]">
+                        <el-checkbox v-for="option in fixedOptions" :key="option" :label="option">{{ option }}</el-checkbox>
+                        <el-checkbox v-for="option in dynamicOptions[item.key]" :key="option" :label="option">{{ option }}</el-checkbox>
+                    </el-checkbox-group>
+
+                    <!-- 输入框和添加按钮 -->
+                    <div style="margin-top: 10px;">
+                        <el-input v-model="newOption[item.key]" placeholder="输入新选项" @keyup.enter="addOption(item.key)"></el-input>
+                        <el-button type="primary" @click="addOption(item.key)" style="margin-top: 5px;">添加选项</el-button>
+                    </div>
+                </el-collapse-item>
+            </el-collapse>
+        </el-main>
+    </el-container>
+</div>
+
+<script src="/node_modules/vue/dist/vue.js"></script>
+<script src="/node_modules/element-ui/lib/index.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                activeNames: [],  // 记录展开的折叠项
+                transData: [
+                    { key: '1', trans_name: '联机交易', trans_type: '转账', trans_channel: '网上银行' },
+                    { key: '2', trans_name: '信贷审批', trans_type: '支付', trans_channel: '手机银行' },
+                    { key: '3', trans_name: '柜面存款', trans_type: '存款', trans_channel: '柜面' },
+                    { key: '4', trans_name: '跨域交易', trans_type: '取款', trans_channel: 'ATM' }
+                ],
+                fixedOptions: ["选项A", "选项B", "选项C"],  // 固定选项
+                dynamicOptions: {},  // 存储每个项目的动态选项
+                selectedOptions: {}, // 存储每个项目的已选选项
+                newOption: {} // 存储用户输入的新选项
+            };
+        },
+        methods: {
+            addOption(key) {
+                if (!this.newOption[key]) return; // 避免空输入
+                if (!this.dynamicOptions[key]) {
+                    this.$set(this.dynamicOptions, key, []); // 确保 dynamicOptions[key] 已初始化
+                }
+                if (!this.dynamicOptions[key].includes(this.newOption[key])) {
+                    this.dynamicOptions[key].push(this.newOption[key]); // 添加新选项
+                }
+                this.newOption[key] = ''; // 清空输入框
+            }
+        },
+        created() {
+            // 初始化 dynamicOptions 和 selectedOptions
+            this.transData.forEach(item => {
+                this.$set(this.dynamicOptions, item.key, []);
+                this.$set(this.selectedOptions, item.key, []);
+            });
+        }
+    });
+</script>
+</body>
+</html>
