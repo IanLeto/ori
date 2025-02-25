@@ -26,6 +26,8 @@
                     <div style="margin-top: 10px;">
                         <el-input v-model="newOption[item.key]" placeholder="输入新选项" @keyup.enter="addOption(item.key)"></el-input>
                         <el-button type="primary" @click="addOption(item.key)" style="margin-top: 5px;">添加选项</el-button>
+                        <el-button type="primary" style="margin-top: 5px;">保存</el-button>
+                        <el-button type="primary" >发送</el-button>
                     </div>
                 </el-collapse-item>
             </el-collapse>
@@ -43,12 +45,12 @@
             return {
                 activeNames: [],  // 记录展开的折叠项
                 transData: [
-                    { key: '1', trans_name: '联机交易', trans_type: '转账', trans_channel: '网上银行' },
-                    { key: '2', trans_name: '信贷审批', trans_type: '支付', trans_channel: '手机银行' },
+                    { key: '1', trans_name: '新零售业务', trans_type: '', trans_channel: '网上银行' },
+                    { key: '2', trans_name: '容器云', trans_type: 'cpaas' },
                     { key: '3', trans_name: '柜面存款', trans_type: '存款', trans_channel: '柜面' },
                     { key: '4', trans_name: '跨域交易', trans_type: '取款', trans_channel: 'ATM' }
                 ],
-                fixedOptions: ["选项A", "选项B", "选项C"],  // 固定选项
+                fixedOptions: ["交易码", "交易渠道", "应用"],  // 固定选项
                 dynamicOptions: {},  // 存储每个项目的动态选项
                 selectedOptions: {}, // 存储每个项目的已选选项
                 newOption: {} // 存储用户输入的新选项
