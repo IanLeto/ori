@@ -1,7 +1,7 @@
 {
   "_comment": {
     "time": "交易时间（格式：YYYY-MM-DD HH:MM:SS）",
-    "intf": "接口名称",
+    "intf": "特征信息",
     "az": "可用区（availability zone）",
     "svc_name": "服务名称",
     "trans_type": "交易类型（如：0922-存量信贷信息）",
