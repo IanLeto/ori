@@ -1,11 +1,12 @@
 <script setup>
-import { reactive } from 'vue'
+import { reactive,onMounted } from 'vue'
+import axios from 'axios'
 
-// 定义表单数据
-const form = reactive({
-  name: '',
+// 定义表单数据的初始值
+const defaultFormData = {
+  title: '',
   weight: null,
-  is_active: false, // 修改字段名，避免不适用的词汇
+  is_fuck: false,
   vol1: '',
   vol2: '',
   vol3: '',
@@ -16,46 +17,67 @@ const form = reactive({
   dev: '',
   coding: '',
   social: ''
+}
+
+const form = reactive({ ...defaultFormData })
+onMounted(async () => {
+  try {
+    const response = await axios.get('http://localhost:1918/v1/record', {
+      params: {
+        region: 'win',
+        start_time: '1740326400'
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (response.data.Code === 200) {
+      const firstItem = response.data.Data.items[0]
+      Object.assign(form, firstItem)
+    }
+  } catch (error) {
+    console.error('请求失败:', error)
+  }
 })
 
 // 提交表单（仅打印数据）
-const submitForm = () => {
-  console.log('提交的数据:', form)
-  alert('数据已提交（仅控制台可见）')
+// 提交表单并保存数据
+const submitForm = async () => {
+  try {
+    const response = await axios.post('http://localhost:1918/v1/record', form)
+    if (response.data.Code === 200) {
+      console.log('数据保存成功')
+      alert('数据已成功保存')
+      resetForm() // 保存成功后重置表单
+    } else {
+      console.error('数据保存失败:', response.data.Message)
+      alert('数据保存失败,请重试')
+    }
+  } catch (error) {
+    console.error('请求失败:', error)
+    alert('数据保存失败,请重试')
+  }
 }
 
 // 重置表单
 const resetForm = () => {
-  Object.assign(form, {
-    name: '',
-    weight: null,
-    is_active: false,
-    vol1: '',
-    vol2: '',
-    vol3: '',
-    vol4: '',
-    content: '',
-    cost: null,
-    retire: null,
-    dev: '',
-    coding: '',
-    social: ''
-  })
+  Object.assign(form, defaultFormData)
 }
 </script>
 
 <template>
   <el-form :model="form" label-width="120px" style="max-width: 600px">
     <el-form-item label="名称">
-      <el-input v-model="form.name" />
+      <el-input v-model="form.title" />
     </el-form-item>
 
-    <el-form-item label="权重">
+    <el-form-item label="体重">
       <el-input-number v-model="form.weight" :min="0" />
     </el-form-item>
 
     <el-form-item label="是否启用">
-      <el-switch v-model="form.is_active" />
+      <el-switch v-model="form.is_fuck" />
     </el-form-item>
 
     <el-form-item label="体积参数">

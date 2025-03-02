@@ -7,7 +7,11 @@ import HelloWorld from './components/HelloWorld.vue';
     <header>
       <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
       <div class="wrapper">
-        <HelloWorld msg="欢迎来到 Vue 3!" />
+        <nav>
+          <router-link to="/">表单</router-link> |
+          <router-link to="/list">列表</router-link>
+        </nav>
+        <router-view></router-view>
       </div>
     </header>
   </div>
