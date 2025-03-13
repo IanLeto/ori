@@ -87,10 +87,12 @@ const showSelectedData = () => {
   `).join('')
 
   ElMessageBox({
-    title: '选中数据详情',
+    title: '发送至oda',
     message: `<div style="max-height: 300px; overflow-y: auto;">${content}</div>`,
     dangerouslyUseHTMLString: true,
-    confirmButtonText: '确定'
+    confirmButtonText: '确定',
+    showCancelButton: true
+
   })
 }
 </script>
