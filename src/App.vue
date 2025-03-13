@@ -10,7 +10,7 @@ import HelloWorld from './components/HelloWorld.vue';
         <nav>
           <router-link to="/">表单</router-link> |
           <router-link to="/list">列表</router-link>
-          <router-link to="/odasetting"></router-link>
+          <router-link to="/trade">交易列表</router-link>
         </nav>
         <router-view></router-view>
       </div>

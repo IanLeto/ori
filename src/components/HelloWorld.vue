@@ -1,6 +1,7 @@
 <script setup>
 import {ref} from 'vue'
 import recordFrom from './Record.vue'
+import tradeInfo from "./TradeInfo.vue";
 // 计数器的响应式数据
 const count = ref(0)
 </script>

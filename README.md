@@ -1,29 +1,49 @@
-# ori
+npm run build -- --dest=/path/to/target
+python3 -m http.server 8080 --directory dist
 
-This template should help get you started developing with Vue 3 in Vite.
+[//]: # (# ori)
 
-## Recommended IDE Setup
+[//]: # ()
+[//]: # (This template should help get you started developing with Vue 3 in Vite.)
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+[//]: # ()
+[//]: # (## Recommended IDE Setup)
 
-## Customize configuration
+[//]: # ()
+[//]: # ([VSCode]&#40;https://code.visualstudio.com/&#41; + [Volar]&#40;https://marketplace.visualstudio.com/items?itemName=Vue.volar&#41; &#40;and disable Vetur&#41;.)
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+[//]: # ()
+[//]: # (## Customize configuration)
 
-## Project Setup
+[//]: # ()
+[//]: # (See [Vite Configuration Reference]&#40;https://vite.dev/config/&#41;.)
 
-```sh
-npm install
-```
+[//]: # ()
+[//]: # (## Project Setup)
 
-### Compile and Hot-Reload for Development
+[//]: # ()
+[//]: # (```sh)
 
-```sh
-npm run dev
-```
+[//]: # (npm install)
 
-### Compile and Minify for Production
+[//]: # (```)
 
-```sh
-npm run build
-```
+[//]: # ()
+[//]: # (### Compile and Hot-Reload for Development)
+
+[//]: # ()
+[//]: # (```sh)
+
+[//]: # (npm run dev)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (### Compile and Minify for Production)
+
+[//]: # ()
+[//]: # (```sh)
+
+[//]: # (npm run build)
+
+[//]: # (```)
