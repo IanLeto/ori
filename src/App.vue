@@ -11,6 +11,7 @@ import HelloWorld from './components/HelloWorld.vue';
           <router-link to="/">表单</router-link> |
           <router-link to="/list">列表</router-link>
           <router-link to="/trade">交易列表</router-link>
+          <router-link to="/detail">交易质量分析</router-link>
         </nav>
         <router-view></router-view>
       </div>

@@ -1,6 +1,6 @@
 <script setup>
 import {ref} from 'vue'
-import { ElMessageBox } from 'element-plus'
+import {ElMessageBox} from 'element-plus'
 
 
 // 预制交易记录数据
@@ -74,7 +74,7 @@ const handleSelectionChange = (val) => {
 }
 const showSelectedData = () => {
   if (multipleSelection.value.length === 0) {
-    ElMessageBox.alert('请先选择数据', '提示', { type: 'warning' })
+    ElMessageBox.alert('请先选择数据', '提示', {type: 'warning'})
     return
   }
 
@@ -102,7 +102,7 @@ const showSelectedData = () => {
     <h2>交易记录列表</h2>
     <div style="margin-top: 20px">
       <el-button @click="toggleSelection([tableData[0], tableData[1]])">
-        Top3选中状态
+        Top3选中状
       </el-button>
       <el-button @click="toggleSelection()">清空选中</el-button>
       <el-button @click="showSelectedData" type="warning">开启交易质量监控</el-button>
@@ -114,11 +114,11 @@ const showSelectedData = () => {
         @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55"/>
-      <el-table-column prop="trans_type_code" label="交易类型代码" width="120"/>
-      <el-table-column prop="trans_channel" label="交易渠道代码" width="140"/>
+      <el-table-column prop="trans_type" label="交易类型" width="190"/>
+      <el-table-column prop="trans_channel" label="交易渠道" width="140"/>
       <el-table-column prop="trans_count" label="交易总次数" width="120"/>
       <el-table-column prop="succ_count" label="成功交易次数" width="120"/>
-      <el-table-column prop="resp_time" label="响应时间（毫秒）" width="150"/>
+      <el-table-column prop="resp_time" label="平均响应时间（毫秒）" width="150"/>
       <el-table-column prop="succ_p" label="成功率">
         <template #default="scope">
           <el-tag :type="scope.row.succ_p === 1 ? 'success' : 'warning'">
@@ -130,4 +130,5 @@ const showSelectedData = () => {
 
 
   </div>
+
 </template>
