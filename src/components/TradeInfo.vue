@@ -1,6 +1,8 @@
 <script setup>
-import {ref} from 'vue'
+import {onMounted, ref} from 'vue'
 import {ElMessageBox} from 'element-plus'
+
+import * as echarts from 'echarts';
 
 
 // 预制交易记录数据
@@ -72,6 +74,18 @@ const toggleSelection = (rows) => {
 const handleSelectionChange = (val) => {
   multipleSelection.value = val
 }
+
+onMounted(() => {
+  const chartDom = document.getElementById("main");
+  const myChart = echarts.init(chartDom);
+  myChart.setOption({
+    title: {text: "ECharts 示例"},
+    tooltip: {},
+    xAxis: {data: ["A", "B", "C", "D"]},
+    yAxis: {},
+    series: [{type: "bar", data: [10, 20, 30, 40]}],
+  });
+});
 const showSelectedData = () => {
   if (multipleSelection.value.length === 0) {
     ElMessageBox.alert('请先选择数据', '提示', {type: 'warning'})
@@ -132,3 +146,5 @@ const showSelectedData = () => {
   </div>
 
 </template>
+
+

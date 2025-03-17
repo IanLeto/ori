@@ -60,6 +60,23 @@ const submitForm = async () => {
   }
 }
 
+const updateForm = async () => {
+  try {
+    const response = await axios.put('http://localhost:1918/v1/record', form)
+    if (response.data.Code === 200) {
+      console.log('数据保存成功')
+      alert('数据已成功保存')
+      resetForm() // 保存成功后重置表单
+    } else {
+      console.error('数据保存失败:', response.data.Message)
+      alert('数据保存失败,请重试')
+    }
+  } catch (error) {
+    console.error('请求失败:', error)
+    alert('数据保存失败,请重试')
+  }
+}
+
 // 重置表单
 const resetForm = () => {
   Object.assign(form, defaultFormData)
@@ -117,6 +134,7 @@ const resetForm = () => {
 
     <el-form-item>
       <el-button type="primary" @click="submitForm">提交</el-button>
+      <el-button type="primary" @click="updateForm">修改</el-button>
       <el-button type="danger" @click="resetForm">重置</el-button>
     </el-form-item>
   </el-form>
