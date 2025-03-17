@@ -61,107 +61,35 @@ const dimensions = ref([
   { key: 'trans_type', label: '交易类型' }
 ])
 
-// 存储选中的维度
-const selectedDimensions = ref([])
 
-// 计算不同维度下的分组数据
-const groupedData = computed(() => {
-  const result = {}
-
-  selectedDimensions.value.forEach((dim) => {
-    const groups = {}
-    tableData.value.forEach((item) => {
-      const key = item[dim]
-      if (!groups[key]) {
-        groups[key] = []
-      }
-      groups[key].push(item)
-    })
-    result[dim] = groups
-  })
-
-  return result
-})
-
-// 选中的数据
-const tableRefs = ref({})
-const selectedRows = ref({})
-
-const handleSelectionChange = (val, dim, key) => {
-  if (!selectedRows.value[dim]) {
-    selectedRows.value[dim] = {}
-  }
-  selectedRows.value[dim][key] = val
-}
-
-// 选中 Top3
-const toggleSelection = (dim, key) => {
-  if (tableRefs.value[dim] && tableRefs.value[dim][key]) {
-    tableRefs.value[dim][key].clearSelection()
-    tableRefs.value[dim][key].toggleRowSelection(groupedData.value[dim][key].slice(0, 3))
-  }
-}
-
-// 清空选中
-const clearSelection = (dim, key) => {
-  if (tableRefs.value[dim] && tableRefs.value[dim][key]) {
-    tableRefs.value[dim][key].clearSelection()
-  }
-}
 
 </script>
 
 <template>
   <div>
     <h2 class="text-xl font-bold my-4">📊 交易数据多维度查询</h2>
+    <el-radio v-model="radio" label="1"> 接口路径url</el-radio>
+    <el-radio v-model="radio" label="2">Pod名称</el-radio>
 
-    <!-- 维度选择 -->
-    <div class="mb-4">
-      <h3 class="font-semibold">选择查询维度：</h3>
-      <el-checkbox-group v-model="selectedDimensions">
-        <el-checkbox
-            v-for="dim in dimensions"
-            :key="dim.key"
-            :label="dim.key"
-        >
-          {{ dim.label }}
-        </el-checkbox>
-      </el-checkbox-group>
-    </div>
-
-    <!-- 动态生成多个表格 -->
-    <div v-for="(groups, dim) in groupedData" :key="dim">
-      <h3 class="text-lg font-semibold mt-4">
-        📌 按 {{ dimensions.find(d => d.key === dim)?.label }} 分组
-      </h3>
-
-      <div v-for="(items, key) in groups" :key="key" class="mb-6 border rounded-lg p-4 shadow">
-        <h4 class="font-semibold text-gray-700 mb-2">{{ key }}</h4>
-
-        <div class="mb-2">
-          <el-button @click="toggleSelection(dim, key)">Top3 选中</el-button>
-          <el-button @click="clearSelection(dim, key)">清空选中</el-button>
-        </div>
-
-        <el-table
-            :ref="el => (tableRefs[dim] = { ...tableRefs[dim], [key]: el })"
-            :data="items"
-            style="width: 100%"
-            @selection-change="val => handleSelectionChange(val, dim, key)"
-        >
-          <el-table-column type="selection" width="55"/>
-          <el-table-column prop="trans_type" label="交易类型" width="190"/>
-          <el-table-column prop="trans_channel" label="交易渠道" width="140"/>
-          <el-table-column prop="succ_p" label="成功率">
-            <template #default="scope">
-              <el-tag :type="scope.row.succ_p === 1 ? 'success' : 'warning'">
-                {{ (scope.row.succ_p * 100).toFixed(2) }}%
-              </el-tag>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-    </div>
+    <el-table
+        ref="tableRef"
+        :data="tableData"
+        style="width: 100%"
+        @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" width="55"/>
+      <el-table-column prop="trans_type" label="交易类型（接口路径）" width="600"/>
+      <el-table-column prop="trans_count" label="交易总次数" width="120"/>
+      <el-table-column prop="succ_count" label="异常交易次数" width="120"/>
+      <el-table-column prop="resp_time" label="平均响应时间（毫秒）" width="150"/>
+      <el-table-column prop="succ_p" label="成功率">
+        <template #default="scope">
+          <el-tag :type="scope.row.succ_p === 1 ? 'success' : 'warning'">
+            {{ (scope.row.succ_p * 100).toFixed(2) }}%
+          </el-tag>
+        </template>
+      </el-table-column>
+    </el-table>
 
   </div>
 </template>
