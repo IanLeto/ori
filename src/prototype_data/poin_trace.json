@@ -3,5 +3,8 @@
   "ceb.biz.cursys":"222",
   "servicecode": "/pwrgtw/payment/01Af",
   "returnCode": "CAAAAA",
+  "error": "level paas",
+  "spanId": "0",
+  "result.code": "200",
   "cluster": "hgw4-dev"
 }

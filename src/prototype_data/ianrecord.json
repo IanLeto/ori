@@ -16,6 +16,7 @@
   },
   "name": "Sample Item",
   "weight": 12.5,
+  "night_weight": 100,
   "is_fuck": true,
   "vol1": "10cm",
   "vol2": "20cm",
