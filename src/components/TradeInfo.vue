@@ -1,429 +1,292 @@
 <script setup>
-import {onMounted, ref} from 'vue'
-import {ElMessageBox} from 'element-plus'
+import { ref, onMounted, computed } from 'vue'
+import { ElMessageBox, ElMessage, ElNotification } from 'element-plus'
+import * as echarts from 'echarts'
 
-import * as echarts from 'echarts';
+// 数据结构定义
+const createTransInfo = ref({
+  cluster: '',
+  trans_type: {
+    '0922': {
+      name: '存量信贷信息',
+      service_codes: ['poin', 'credit']
+    },
+    '0923': {
+      name: '信用评估',
+      service_codes: ['credit', 'risk']
+    },
+    '0924': {
+      name: '风险分析',
+      service_codes: ['risk', 'poin']
+    }
+  },
+  interval: 5
+})
 
-
-// 预制交易记录数据
+// 数据列表
 const tableData = ref([
   {
-    time: "2024-03-13 10:00:00",
-    intf: "cpaas",
-    az: "az1",
-    svc_name: "poin",
-    trans_type: "0922-存量信贷信息/spay/pan/usc-ACCAAA",
-    trans_type_code: "0922",
-    trans_channel: "1110",
-    ret_code: "CFC1991",
-    trans_count: 10,
-    succ_count: 8,
-    resp_time: 120,
-    resp_count: 10,
-    succ_p: 0.8
+    cluster: 'cluster-01',
+    trans_type: '0922',
+    service_codes: ['poin', 'credit'],
+    timestamp: new Date().toISOString(),
+    success_rate: 0.85,
+    total_transactions: 100,
+    successful_transactions: 85
   },
   {
-    time: "2024-03-13 11:00:00",
-    intf: "cpaas",
-    az: "az2",
-    svc_name: "credit",
-    trans_type: "0923- spay/pan/usc-ACCAAA",
-    trans_type_code: "0923",
-    trans_channel: "1120",
-    ret_code: "CFC2000",
-    trans_count: 5,
-    succ_count: 5,
-    resp_time: 95,
-    resp_count: 5,
-    succ_p: 1
-  },
-  {
-    time: "2024-03-13 12:00:00",
-    intf: "cpaas",
-    az: "az3",
-    svc_name: "risk",
-    trans_type: "0924-风险评估",
-    trans_type_code: "0924",
-    trans_channel: "1130",
-    ret_code: "CFC1999",
-    trans_count: 15,
-    succ_count: 12,
-    resp_time: 180,
-    resp_count: 15,
-    succ_p: 0.8
-  },
-  {
-    time: "2024-03-13 11:00:00",
-    intf: "cpaas",
-    az: "az2",
-    svc_name: "credit",
-    trans_type: "0923- spay/pan/usc-ACCAAA",
-    trans_type_code: "0923",
-    trans_channel: "1120",
-    ret_code: "CFC2000",
-    trans_count: 5,
-    succ_count: 5,
-    resp_time: 95,
-    resp_count: 5,
-    succ_p: 1
-  },
-  {
-    time: "2024-03-13 12:00:00",
-    intf: "cpaas",
-    az: "az3",
-    svc_name: "risk",
-    trans_type: "0924-风险评估",
-    trans_type_code: "0924",
-    trans_channel: "1130",
-    ret_code: "CFC1999",
-    trans_count: 15,
-    succ_count: 12,
-    resp_time: 180,
-    resp_count: 15,
-    succ_p: 0.8
-  },
-  {
-    time: "2024-03-13 11:00:00",
-    intf: "cpaas",
-    az: "az2",
-    svc_name: "credit",
-    trans_type: "0923- spay/pan/usc-ACCAAA",
-    trans_type_code: "0923",
-    trans_channel: "1120",
-    ret_code: "CFC2000",
-    trans_count: 5,
-    succ_count: 5,
-    resp_time: 95,
-    resp_count: 5,
-    succ_p: 1
-  },
-  {
-    time: "2024-03-13 12:00:00",
-    intf: "cpaas",
-    az: "az3",
-    svc_name: "risk",
-    trans_type: "0924-风险评估",
-    trans_type_code: "0924",
-    trans_channel: "1130",
-    ret_code: "CFC1999",
-    trans_count: 15,
-    succ_count: 12,
-    resp_time: 180,
-    resp_count: 15,
-    succ_p: 0.8
-  },
-  {
-    time: "2024-03-13 11:00:00",
-    intf: "cpaas",
-    az: "az2",
-    svc_name: "credit",
-    trans_type: "0923- spay/pan/usc-ACCAAA",
-    trans_type_code: "0923",
-    trans_channel: "1120",
-    ret_code: "CFC2000",
-    trans_count: 5,
-    succ_count: 5,
-    resp_time: 95,
-    resp_count: 5,
-    succ_p: 1
-  },
-  {
-    time: "2024-03-13 12:00:00",
-    intf: "cpaas",
-    az: "az3",
-    svc_name: "risk",
-    trans_type: "0924-风险评估",
-    trans_type_code: "0924",
-    trans_channel: "1130",
-    ret_code: "CFC1999",
-    trans_count: 15,
-    succ_count: 12,
-    resp_time: 180,
-    resp_count: 15,
-    succ_p: 0.8
-  },
-  {
-    time: "2024-03-13 11:00:00",
-    intf: "cpaas",
-    az: "az2",
-    svc_name: "credit",
-    trans_type: "0923- spay/pan/usc-ACCAAA",
-    trans_type_code: "0923",
-    trans_channel: "1120",
-    ret_code: "CFC2000",
-    trans_count: 5,
-    succ_count: 5,
-    resp_time: 95,
-    resp_count: 5,
-    succ_p: 1
-  },
-  {
-    time: "2024-03-13 12:00:00",
-    intf: "cpaas",
-    az: "az3",
-    svc_name: "risk",
-    trans_type: "0924-风险评估",
-    trans_type_code: "0924",
-    trans_channel: "1130",
-    ret_code: "CFC1999",
-    trans_count: 15,
-    succ_count: 12,
-    resp_time: 180,
-    resp_count: 15,
-    succ_p: 0.8
-  },
-  {
-    time: "2024-03-13 11:00:00",
-    intf: "cpaas",
-    az: "az2",
-    svc_name: "credit",
-    trans_type: "0923- spay/pan/usc-ACCAAA",
-    trans_type_code: "0923",
-    trans_channel: "1120",
-    ret_code: "CFC2000",
-    trans_count: 5,
-    succ_count: 5,
-    resp_time: 95,
-    resp_count: 5,
-    succ_p: 1
-  },
-  {
-    time: "2024-03-13 12:00:00",
-    intf: "cpaas",
-    az: "az3",
-    svc_name: "risk",
-    trans_type: "0924-风险评估",
-    trans_type_code: "0924",
-    trans_channel: "1130",
-    ret_code: "CFC1999",
-    trans_count: 15,
-    succ_count: 12,
-    resp_time: 180,
-    resp_count: 15,
-    succ_p: 0.8
-  },
-  {
-    time: "2024-03-13 11:00:00",
-    intf: "cpaas",
-    az: "az2",
-    svc_name: "credit",
-    trans_type: "0923- spay/pan/usc-ACCAAA",
-    trans_type_code: "0923",
-    trans_channel: "1120",
-    ret_code: "CFC2000",
-    trans_count: 5,
-    succ_count: 5,
-    resp_time: 95,
-    resp_count: 5,
-    succ_p: 1
-  },
-  {
-    time: "2024-03-13 12:00:00",
-    intf: "cpaas",
-    az: "az3",
-    svc_name: "risk",
-    trans_type: "0924-风险评估",
-    trans_type_code: "0924",
-    trans_channel: "1130",
-    ret_code: "CFC1999",
-    trans_count: 15,
-    succ_count: 12,
-    resp_time: 180,
-    resp_count: 15,
-    succ_p: 0.8
-  },
-  {
-    time: "2024-03-13 11:00:00",
-    intf: "cpaas",
-    az: "az2",
-    svc_name: "credit",
-    trans_type: "0923- spay/pan/usc-ACCAAA",
-    trans_type_code: "0923",
-    trans_channel: "1120",
-    ret_code: "CFC2000",
-    trans_count: 5,
-    succ_count: 5,
-    resp_time: 95,
-    resp_count: 5,
-    succ_p: 1
-  },
-  {
-    time: "2024-03-13 12:00:00",
-    intf: "cpaas",
-    az: "az3",
-    svc_name: "risk",
-    trans_type: "0924-风险评估",
-    trans_type_code: "0924",
-    trans_channel: "1130",
-    ret_code: "CFC1999",
-    trans_count: 15,
-    succ_count: 12,
-    resp_time: 180,
-    resp_count: 15,
-    succ_p: 0.8
+    cluster: 'cluster-02',
+    trans_type: '0924',
+    service_codes: ['risk', 'poin'],
+    timestamp: new Date().toISOString(),
+    success_rate: 0.92,
+    total_transactions: 120,
+    successful_transactions: 110
   }
 ])
 
-const tableRef = ref(null)
-const multipleSelection = ref([])
+// 服务编码映射
+const serviceCodeMap = {
+  'poin': '积分服务',
+  'credit': '信贷服务',
+  'risk': '风险服务'
+}
 
-// 切换选中状态
-const toggleSelection = (rows) => {
-  if (tableRef.value) {
-    if (rows) {
-      rows.forEach(row => {
-        tableRef.value.toggleRowSelection(row)
-      })
-    } else {
-      tableRef.value.clearSelection()
+// 告警设置弹窗数据
+const alarmDialogVisible = ref(false)
+const currentAlarmTransType = ref('')
+const alarmThreshold = ref(0.9)
+const alarmDescription = ref('')
+
+// 按trans_type维度处理数据
+const transTypeStatistics = computed(() => {
+  const stats = {}
+  tableData.value.forEach(item => {
+    if (!stats[item.trans_type]) {
+      stats[item.trans_type] = {
+        name: createTransInfo.value.trans_type[item.trans_type].name,
+        total_transactions: 0,
+        successful_transactions: 0,
+        service_codes: new Set()
+      }
     }
-  }
-}
 
-// 处理多选变化
-const handleSelectionChange = (val) => {
-  multipleSelection.value = val
-}
-const chartRef = ref(null)
-const rawData = [
-  [100, 302, 301, 334, 390, 330, 320,100, 302, 301, 334, 390, 330, 320], // 第一个系列的数据
-  [320, 132, 101, 134, 90, 230, 210,320, 132, 101, 134, 90, 230, 210]   // 第二个系列的数据
-];
-// 计算总值（避免负数）
-const totalData = [];
-for (let i = 0; i < rawData[0].length; ++i) {
-  let sum = 0;
-  for (let j = 0; j < rawData.length; ++j) {
-    sum += rawData[j][i];
-  }
-  totalData.push(sum);
-}
+    stats[item.trans_type].total_transactions += item.total_transactions
+    stats[item.trans_type].successful_transactions += item.successful_transactions
 
-// 颜色数组（黄色和红色）
-const colors =  ['#FF5733','#FFC300'];
-const series = ['连路数', '异常数'].map((name, sid) => {
-  return {
-    name,
-    type: 'bar',
-    stack: 'total',
-    barWidth: '50%',
-    data: rawData[sid],
-    itemStyle: {
-      color: colors[sid] // 每个 series 赋予不同的颜色
-    }
-  };
-});
-const initChart = () => {
-  const chartDom = chartRef.value;
+    item.service_codes.forEach(code => {
+      stats[item.trans_type].service_codes.add(code)
+    })
+  })
 
-  const myChart = echarts.init(chartDom)
-  myChart.setOption({
-    legend: {
-      selectedMode: false
-    },
-    xAxis: {
-      type: 'category',
-      data: ['时间段1', '时间段2', '时间段3', '时间段T', '时间段F', '时间段S', '时间段S2','时间段1', '时间段2', '时间段3', '时间段T', '时间段F', '时间段S', '时间段S2']
-    },
-    yAxis: {
-      type: 'value'
-    },
-    series: series
+  return Object.entries(stats).map(([key, value]) => ({
+    trans_type: key,
+    ...value,
+    service_codes: Array.from(value.service_codes),
+    success_rate: value.successful_transactions / value.total_transactions
+  }))
+})
+
+// 保存交易类型配置
+const saveTransTypeConfig = (transType) => {
+  ElMessageBox.confirm(
+      `确认保存交易类型 "${createTransInfo.value.trans_type[transType].name}" 的配置?`,
+      '保存确认',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'info'
+      }
+  ).then(() => {
+    ElMessage.success(`交易类型 "${createTransInfo.value.trans_type[transType].name}" 配置已保存`)
+  }).catch(() => {
+    ElMessage.info('已取消保存')
   })
 }
-onMounted(() => {
-  initChart()
-})
-const showSelectedData = () => {
-  if (multipleSelection.value.length === 0) {
-    ElMessageBox.alert('请先选择数据', '提示', {type: 'warning'})
+
+// 打开告警设置弹窗
+const openAlarmSettingDialog = (transType) => {
+  currentAlarmTransType.value = transType
+  alarmThreshold.value = 0.9
+  alarmDescription.value = ''
+  alarmDialogVisible.value = true
+}
+
+// 确认告警设置
+const confirmAlarmSetting = () => {
+  if (alarmThreshold.value <= 0 || alarmThreshold.value > 1) {
+    ElMessage.error('时间间隔必须在0-1之间')
     return
   }
 
-  let content = multipleSelection.value.map(item => `
-    <div style="padding: 10px; border-bottom: 1px solid #eee;">
-<!--      <p><strong>交易渠道：</strong>${item.trans_channel}</p>-->
-      <p><strong>交易类型：</strong>${item.trans_type}</p>
-      <p><strong>成功率：</strong><span style="color: ${item.succ_p === 1 ? 'green' : 'red'}">${(item.succ_p * 100).toFixed(2)}%</span></p>
-    </div>
-  `).join('')
-
-  ElMessageBox({
-    title: '开启交易质量监控',
-    message: `<div style="max-height: 300px; overflow-y: auto;">${content}</div>`,
-    dangerouslyUseHTMLString: true,
-    confirmButtonText: '确定',
-    showCancelButton: true
-
+  ElNotification({
+    title: '告警设置成功',
+    message: `交易类型 "${createTransInfo.value.trans_type[currentAlarmTransType.value].name}" 时间间隔设置为 ${(alarmThreshold.value * 100).toFixed(2)}%`,
+    type: 'success'
   })
+
+  alarmDialogVisible.value = false
 }
+
+// 图表初始化函数
+const chartRef = ref(null)
+const initChart = () => {
+  const chartDom = chartRef.value
+  const myChart = echarts.init(chartDom)
+
+  const option = {
+    title: { text: '交易类型成功率分析' },
+    tooltip: { trigger: 'axis' },
+    xAxis: {
+      type: 'category',
+      data: transTypeStatistics.value.map(item => item.name)
+    },
+    yAxis: {
+      type: 'value',
+      min: 0,
+      max: 1,
+      axisLabel: {
+        formatter: '{value%}'
+      }
+    },
+    series: [{
+      name: '成功率',
+      type: 'bar',
+      data: transTypeStatistics.value.map(item => item.success_rate),
+      itemStyle: {
+        color: (params) => {
+          return params.value > 0.9 ? '#67C23A' : '#F56C6C'
+        }
+      }
+    }]
+  }
+
+  myChart.setOption(option)
+}
+
+onMounted(initChart)
 </script>
 
 <template>
-  <div>
-    <h2>交易记录列表</h2>
-    <div style="margin-top: 20px">
-      <el-button @click="toggleSelection([tableData[0], tableData[1]])">
-        全选
-      </el-button>
-      <el-button @click="toggleSelection()">清空选中</el-button>
-      <el-button @click="showSelectedData" type="warning">开启交易质量监控</el-button>
-    </div>
-    <el-table
-        ref="tableRef"
-        :data="tableData"
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-    >
-      <el-table-column type="selection" width="55"/>
-      <el-table-column prop="trans_type" label="交易类型（接口路径）" width="600"/>
-      <el-table-column prop="trans_count" label="交易总次数" width="120"/>
-      <el-table-column prop="succ_count" label="异常交易次数" width="120"/>
-      <el-table-column prop="resp_time" label="平均响应时间（毫秒）" width="150"/>
-      <el-table-column prop="succ_p" label="成功率">
+  <div class="transaction-management">
+    <el-form :model="createTransInfo" label-width="120px">
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="集群">
+            <el-select v-model="createTransInfo.cluster" placeholder="选择集群">
+              <el-option label="集群-01" value="cluster-01"></el-option>
+              <el-option label="集群-02" value="cluster-02"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="监控间隔">
+            <el-input-number
+                v-model="createTransInfo.interval"
+                :min="1"
+                :max="60"
+            ></el-input-number>
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+
+    <el-table :data="transTypeStatistics" stripe>
+      <el-table-column prop="name" label="交易类型" width="200">
         <template #default="scope">
-          <el-tag :type="scope.row.succ_p === 1 ? 'success' : 'warning'">
-            {{ (scope.row.succ_p * 100).toFixed(2) }}%
+          {{ scope.row.name }}
+        </template>
+      </el-table-column>
+
+      <el-table-column label="服务编码" width="300">
+        <template #default="scope">
+          <el-tag
+              v-for="code in scope.row.service_codes"
+              :key="code"
+              type="info"
+              style="margin-right: 5px;"
+          >
+            {{ serviceCodeMap[code] }}
           </el-tag>
         </template>
       </el-table-column>
+
+      <el-table-column label="交易总数" prop="total_transactions" width="150">
+      </el-table-column>
+
+      <el-table-column label="成功率" width="200">
+        <template #default="scope">
+          <el-tag :type="scope.row.success_rate > 0.9 ? 'success' : 'danger'">
+            {{ (scope.row.success_rate * 100).toFixed(2) }}%
+          </el-tag>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="操作" width="200">
+        <template #default="scope">
+          <el-button-group>
+            <el-button
+                type="primary"
+                size="small"
+                @click="saveTransTypeConfig(scope.row.trans_type)"
+            >
+              保存
+            </el-button>
+            <el-button
+                type="warning"
+                size="small"
+                @click="openAlarmSettingDialog(scope.row.trans_type)"
+            >
+              设置告警
+            </el-button>
+          </el-button-group>
+        </template>
+      </el-table-column>
     </el-table>
-    <div style="display: flex; flex-direction: column; width: 100%; align-items: center; gap: 20px;">
 
-      <!-- 并列的 el-descriptions，设置固定宽度与对齐 -->
-      <div ref="chartRef" style="width: 100%; max-width: 1200px; height: 400px; margin-top: 20px;"></div>
-      <div style="display: flex; width: 100%; max-width: 1200px; gap: 20px;">
-        <el-descriptions title="交易信息" border :column="1" style="flex: 1;">
-          <el-descriptions-item label="交易总数">1000</el-descriptions-item>
-          <el-descriptions-item label="成功交易数">950</el-descriptions-item>
-          <el-descriptions-item label="失败交易数">50</el-descriptions-item>
-          <el-descriptions-item label="未知交易数">12</el-descriptions-item>
-        </el-descriptions>
+    <!-- 告警设置弹窗 -->
+    <el-dialog
+        v-model="alarmDialogVisible"
+        :title="`设置 ${createTransInfo.trans_type[currentAlarmTransType]?.name || ''} 时间间隔`"
+        width="400px"
+    >
+      <el-form label-width="120px">
+        <el-form-item label="时间间隔">
+          <el-input-number
+              v-model="alarmThreshold"
+              :precision="2"
+              :step="0.01"
+              :min="0"
+              :max="1"
+          >
+            <template #append>%</template>
+          </el-input-number>
+        </el-form-item>
 
-        <el-descriptions title="异常统计" border :column="1" style="flex: 1;">
-          <el-descriptions-item label="异常总数" label-width="80px">
-            <span style="font-size: 20px; font-weight: bold;">50</span>
-          </el-descriptions-item>
-          <el-descriptions-item label="异常总数" label-width="80px">
-            <span style="font-size: 20px; font-weight: bold;">50</span>
-          </el-descriptions-item>
-          <el-descriptions-item label="异常总数" label-width="80px">
-            <span style="font-size: 20px; font-weight: bold;">50</span>
-          </el-descriptions-item>
-          <el-descriptions-item label="异常总数" label-width="80px">
-            <span style="font-size: 20px; font-weight: bold;">50</span>
-          </el-descriptions-item>
-        </el-descriptions>
-      </div>
+        <el-form-item label="告警说明">
+          <el-input
+              v-model="alarmDescription"
+              type="textarea"
+              placeholder="请输入告警详细说明(可选)"
+              :rows="3"
+          ></el-input>
+        </el-form-item>
+      </el-form>
 
-      <!-- ECharts 绑定的 div，确保与上面 descriptions 对齐 -->
+      <template #footer>
+        <el-button @click="alarmDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="confirmAlarmSetting">
+          确 定
+        </el-button>
+      </template>
+    </el-dialog>
 
-
-    </div>
-
-
+    <div ref="chartRef" style="width: 100%; height: 400px;"></div>
   </div>
-
 </template>
 
-
+<style scoped>
+.transaction-management {
+  padding: 20px;
+}
+</style>
