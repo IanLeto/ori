@@ -4,8 +4,9 @@ import axios from 'axios'
 
 // 定义表单数据的初始值
 const defaultFormData = {
+  id: 0,
   title: '',
-  weight: null,
+  weight: 0,
   is_fuck: false,
   vol1: '',
   vol2: '',
@@ -16,29 +17,57 @@ const defaultFormData = {
   retire: null,
   dev: '',
   coding: '',
-  social: ''
+  social: '',
+  region: "win"
 }
 
-const form = reactive({ ...defaultFormData })
-onMounted(async () => {
+// 获取当天的开始时间戳（零点）
+const getTodayStartTimestamp = () => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return Math.floor(today.getTime() / 1000).toString()
+}
+
+// 获取当天的结束时间戳（23:59:59）
+const getTodayEndTimestamp = () => {
+  const today = new Date()
+  today.setHours(23, 59, 59, 999)
+  return Math.floor(today.getTime() / 1000).toString()
+}
+
+// 获取当天的记录
+const fetchTodayRecord = async () => {
   try {
+    const startTime = getTodayStartTimestamp()
+    const endTime = getTodayEndTimestamp()
+
     const response = await axios.get('http://localhost:1918/v1/record', {
       params: {
         region: 'win',
-        start_time: '1740326400'
+        start_time: startTime,
+        end_time: endTime
       },
       headers: {
         'Content-Type': 'application/json'
       }
     })
 
-    if (response.data.Code === 200) {
+    if (response.data.Code === 200 && response.data.Data.items && response.data.Data.items.length > 0) {
       const firstItem = response.data.Data.items[0]
       Object.assign(form, firstItem)
+      console.log('已加载当天记录:', firstItem)
+    } else {
+      console.log('当天无记录，显示空表单')
+      resetForm() // 如果没有当天记录，重置表单
     }
   } catch (error) {
     console.error('请求失败:', error)
   }
+}
+
+const form = reactive({ ...defaultFormData })
+onMounted(() => {
+  fetchTodayRecord()
 })
 
 // 提交表单（仅打印数据）
@@ -61,6 +90,7 @@ const submitForm = async () => {
 }
 
 const updateForm = async () => {
+  console.log(form)
   try {
     const response = await axios.put('http://localhost:1918/v1/record', form)
     if (response.data.Code === 200) {
