@@ -1,10 +1,11 @@
 {
   "ceb.biz.orgsys":"011",
   "ceb.biz.cursys":"222",
-  "servicecode": "/pwrgtw/payment/01Af",
+  "serviceCode": "/pwrgtw/payment/01Af",
   "returnCode": "CAAAAA",
   "error": "level paas",
   "spanId": "0",
   "result.code": "200",
-  "cluster": "hgw4-dev"
+  "cluster": "hgw4-dev",
+  "biz.expend": {"d1":"metric1","d2":"metric2"}
 }

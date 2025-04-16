@@ -6,16 +6,12 @@
     "svc_name": "服务名称",
     "trans_type": "交易类型（如：0922-存量信贷信息）",
     "succ_count": "成功交易次数",
-    "succ_p": "成功率（1 表示 100%）",
     "fail_count": "失败",
-    "fail_p": 1
   },
   "time": "2018-09-06 15:00:00",
   "intf": "cpaas",
   "svc_name": "poin",
   "trans_type": "/pwrgtw/payment/01Af",
   "succ_count": 1000,
-  "succ_p": 99,
-  "fail_count": 10,
-  "fail_p": 1
+  "res_count": 2000
 }
