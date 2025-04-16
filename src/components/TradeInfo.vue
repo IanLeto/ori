@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, reactive } from 'vue'
 import { ElMessageBox, ElMessage, ElNotification } from 'element-plus'
 import * as echarts from 'echarts'
 
@@ -9,15 +9,18 @@ const createTransInfo = ref({
   trans_type: {
     '0922': {
       name: '存量信贷信息',
-      service_codes: ['poin', 'credit']
+      service_codes: ['poin', 'credit'],
+      custom_dimensions: [] // 添加自定义维度数组
     },
     '0923': {
       name: '信用评估',
-      service_codes: ['credit', 'risk']
+      service_codes: ['credit', 'risk'],
+      custom_dimensions: []
     },
     '0924': {
       name: '风险分析',
-      service_codes: ['risk', 'poin']
+      service_codes: ['risk', 'poin'],
+      custom_dimensions: []
     }
   },
   interval: 5
@@ -29,6 +32,7 @@ const tableData = ref([
     cluster: 'cluster-01',
     trans_type: '0922',
     service_codes: ['poin', 'credit'],
+    custom_dimensions: [], // 添加自定义维度数组
     timestamp: new Date().toISOString(),
     success_rate: 0.85,
     total_transactions: 100,
@@ -38,6 +42,7 @@ const tableData = ref([
     cluster: 'cluster-02',
     trans_type: '0924',
     service_codes: ['risk', 'poin'],
+    custom_dimensions: [],
     timestamp: new Date().toISOString(),
     success_rate: 0.92,
     total_transactions: 120,
@@ -46,17 +51,28 @@ const tableData = ref([
 ])
 
 // 服务编码映射
-const serviceCodeMap = {
-  'poin': '积分服务',
-  'credit': '信贷服务',
-  'risk': '风险服务'
-}
+const serviceCodeMap = reactive({
+  'poin': 'AAAAA',
+  'credit': 'S-ffF',
+  'risk': 'CCCAAAA'
+})
+
+// 自定义维度弹窗数据
+const dimensionDialogVisible = ref(false)
+const newDimensionName = ref('')
+const newDimensionValues = ref([])
+const newDimensionValueInput = ref('')
+const editingDimensions = ref([])
 
 // 告警设置弹窗数据
 const alarmDialogVisible = ref(false)
 const currentAlarmTransType = ref('')
 const alarmThreshold = ref(0.9)
 const alarmDescription = ref('')
+
+// 服务编码编辑相关状态
+const editingRow = ref(null) // 正在编辑的行
+const newServiceCode = ref('') // 新添加的服务编码
 
 // 按trans_type维度处理数据
 const transTypeStatistics = computed(() => {
@@ -67,7 +83,8 @@ const transTypeStatistics = computed(() => {
         name: createTransInfo.value.trans_type[item.trans_type].name,
         total_transactions: 0,
         successful_transactions: 0,
-        service_codes: new Set()
+        service_codes: new Set(),
+        custom_dimensions: item.custom_dimensions || [] // 添加自定义维度
       }
     }
 
@@ -128,6 +145,128 @@ const confirmAlarmSetting = () => {
   alarmDialogVisible.value = false
 }
 
+// 开始编辑服务编码
+const startEditServiceCodes = (row) => {
+  editingRow.value = row;
+  newServiceCode.value = '';
+}
+
+// 结束编辑服务编码
+const endEditServiceCodes = () => {
+  // 更新 createTransInfo 中的配置
+  if (editingRow.value && editingRow.value.trans_type) {
+    const transType = editingRow.value.trans_type;
+    createTransInfo.value.trans_type[transType].service_codes = [...editingRow.value.service_codes];
+
+    // 更新 tableData 中对应的记录
+    tableData.value.forEach(item => {
+      if (item.trans_type === transType) {
+        item.service_codes = [...editingRow.value.service_codes];
+      }
+    });
+  }
+
+  editingRow.value = null;
+}
+
+// 删除服务编码
+const removeServiceCode = (row, code) => {
+  const index = row.service_codes.indexOf(code);
+  if (index > -1) {
+    row.service_codes.splice(index, 1);
+  }
+}
+
+// 添加服务编码
+const addServiceCode = (row) => {
+  if (!newServiceCode.value) {
+    ElMessage.warning('请输入服务编码');
+    return;
+  }
+
+  if (!row.service_codes.includes(newServiceCode.value)) {
+    // 如果添加的服务编码不在映射表中，自动添加
+    if (!serviceCodeMap[newServiceCode.value]) {
+      serviceCodeMap[newServiceCode.value] = newServiceCode.value;
+    }
+
+    row.service_codes.push(newServiceCode.value);
+    newServiceCode.value = '';
+  } else {
+    ElMessage.warning('该服务编码已存在');
+  }
+}
+
+// 打开自定义维度弹窗
+const openDimensionDialog = () => {
+  dimensionDialogVisible.value = true;
+  newDimensionName.value = '';
+  newDimensionValues.value = [];
+  newDimensionValueInput.value = '';
+
+  // 获取已有维度
+  editingDimensions.value = [];
+  Object.values(createTransInfo.value.trans_type).forEach(type => {
+    if (type.custom_dimensions) {
+      type.custom_dimensions.forEach(dim => {
+        if (!editingDimensions.value.find(d => d.name === dim.name)) {
+          editingDimensions.value.push({ ...dim });
+        }
+      });
+    }
+  });
+}
+
+
+
+// 删除现有维度值
+const removeExistingDimensionValue = (dimensionIndex, valueIndex) => {
+  editingDimensions.value[dimensionIndex].values.splice(valueIndex, 1);
+}
+
+
+// 添加新维度
+const addNewDimension = () => {
+  if (!newDimensionName.value.trim()) {
+    ElMessage.warning('维度名称不能为空');
+    return;
+  }
+
+  editingDimensions.value.push({
+    name: newDimensionName.value,
+    values: [...newDimensionValues.value]
+  });
+
+  newDimensionName.value = '';
+  newDimensionValues.value = [];
+}
+
+// 删除维度
+const removeDimension = (index) => {
+  editingDimensions.value.splice(index, 1);
+}
+
+// 确认自定义维度设置
+const confirmDimensionSetting = () => {
+  // 更新所有交易类型的自定义维度
+  Object.keys(createTransInfo.value.trans_type).forEach(transType => {
+    createTransInfo.value.trans_type[transType].custom_dimensions = [...editingDimensions.value];
+  });
+
+  // 更新数据列表中的自定义维度
+  tableData.value.forEach(item => {
+    item.custom_dimensions = [...editingDimensions.value];
+  });
+
+  ElNotification({
+    title: '自定义维度设置成功',
+    message: `已添加 ${editingDimensions.value.length} 个自定义维度`,
+    type: 'success'
+  });
+
+  dimensionDialogVisible.value = false;
+}
+
 // 图表初始化函数
 const chartRef = ref(null)
 const initChart = () => {
@@ -169,52 +308,95 @@ onMounted(initChart)
 
 <template>
   <div class="transaction-management">
-    <el-form :model="createTransInfo" label-width="120px">
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-form-item label="集群">
-            <el-select v-model="createTransInfo.cluster" placeholder="选择集群">
-              <el-option label="集群-01" value="cluster-01"></el-option>
-              <el-option label="集群-02" value="cluster-02"></el-option>
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="监控间隔">
-            <el-input-number
-                v-model="createTransInfo.interval"
-                :min="1"
-                :max="60"
-            ></el-input-number>
-          </el-form-item>
-        </el-col>
-      </el-row>
-    </el-form>
+    <el-row :gutter="20" style="margin-bottom: 20px;">
+      <el-col :span="24" style="display: flex; justify-content: flex-end;">
+        <el-button
+            type="primary"
+            @click="openDimensionDialog"
+            style="margin-right: 10px;">
+          添加自定义维度
+        </el-button>
+      </el-col>
+    </el-row>
 
     <el-table :data="transTypeStatistics" stripe>
-      <el-table-column prop="name" label="交易类型" width="200">
+      <el-table-column prop="name" label="交易类型" width="180">
         <template #default="scope">
           {{ scope.row.name }}
         </template>
       </el-table-column>
 
-      <el-table-column label="服务编码" width="300">
+      <el-table-column label="服务编码" min-width="380">
         <template #default="scope">
-          <el-tag
-              v-for="code in scope.row.service_codes"
-              :key="code"
-              type="info"
-              style="margin-right: 5px;"
-          >
-            {{ serviceCodeMap[code] }}
-          </el-tag>
+          <div v-if="editingRow && editingRow.trans_type === scope.row.trans_type">
+            <!-- 编辑模式 -->
+            <div style="margin-bottom: 10px;">
+              <el-tag
+                  v-for="code in editingRow.service_codes"
+                  :key="code"
+                  type="info"
+                  closable
+                  @close="removeServiceCode(editingRow, code)"
+                  style="margin-right: 5px; margin-bottom: 5px;"
+              >
+                {{ serviceCodeMap[code] || code }}
+              </el-tag>
+            </div>
+            <div style="display: flex; align-items: center;">
+              <el-input
+                  v-model="newServiceCode"
+                  placeholder="输入服务编码"
+                  style="width: 150px; margin-right: 10px;"
+                  @keyup.enter="addServiceCode(editingRow)"
+              ></el-input>
+              <el-button type="success" size="small" @click="addServiceCode(editingRow)">添加</el-button>
+              <el-button type="primary" size="small" @click="endEditServiceCodes" style="margin-left: 10px;">完成</el-button>
+            </div>
+          </div>
+          <div v-else>
+            <!-- 显示模式 -->
+            <div>
+              <el-tag
+                  v-for="code in scope.row.service_codes"
+                  :key="code"
+                  type="info"
+                  style="margin-right: 5px; margin-bottom: 5px;"
+              >
+                {{ serviceCodeMap[code] || code }}
+              </el-tag>
+              <el-button
+                  type="primary"
+                  size="small"
+                  icon="Edit"
+                  circle
+                  @click="startEditServiceCodes(scope.row)"
+                  style="margin-left: 5px;"
+              ></el-button>
+            </div>
+          </div>
         </template>
       </el-table-column>
 
-      <el-table-column label="交易总数" prop="total_transactions" width="150">
+      <!-- 自定义维度列 -->
+      <el-table-column
+          v-for="dimension in editingDimensions"
+          :key="dimension.name"
+          :label="dimension.name"
+          min-width="150">
+        <template #default="scope">
+          <el-select v-model="scope.row.selectedValues" multiple collapse-tags
+                     :placeholder="`选择${dimension.name}`" style="width: 100%;"
+                     allow-create filterable>
+            <el-option v-for="value in dimension.values" :key="value" :label="value" :value="value">
+            </el-option>
+          </el-select>
+        </template>
       </el-table-column>
 
-      <el-table-column label="成功率" width="200">
+      <el-table-column label="交易总数" prop="total_transactions" width="120">
+      </el-table-column>
+
+      <el-table-column label="成功率" width="120">
         <template #default="scope">
           <el-tag :type="scope.row.success_rate > 0.9 ? 'success' : 'danger'">
             {{ (scope.row.success_rate * 100).toFixed(2) }}%
@@ -281,7 +463,60 @@ onMounted(initChart)
       </template>
     </el-dialog>
 
-    <div ref="chartRef" style="width: 100%; height: 400px;"></div>
+    <!-- 自定义维度设置弹窗 -->
+    <el-dialog
+        v-model="dimensionDialogVisible"
+        title="设置自定义维度"
+        width="700px"
+    >
+      <!-- 现有维度列表 -->
+      <div v-if="editingDimensions.length > 0" style="margin-bottom: 20px;">
+        <h3>现有维度</h3>
+        <el-card v-for="(dimension, dimIndex) in editingDimensions" :key="dimension.name"
+                 style="margin-bottom: 15px;">
+          <template #header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>{{ dimension.name }}</span>
+              <el-button type="danger" size="small" @click="removeDimension(dimIndex)">
+                删除维度
+              </el-button>
+            </div>
+          </template>
+          <div style="margin-bottom: 10px;">
+            <el-tag
+                v-for="(value, valIndex) in dimension.values"
+                :key="value"
+                closable
+                @close="removeExistingDimensionValue(dimIndex, valIndex)"
+                style="margin-right: 5px; margin-bottom: 5px;"
+            >
+              {{ value }}
+            </el-tag>
+          </div>
+        </el-card>
+      </div>
+
+      <!-- 添加新维度 -->
+      <el-divider>添加新维度</el-divider>
+
+      <el-form>
+        <el-form-item label="维度名称">
+          <el-input v-model="newDimensionName" placeholder="例如: 地域、渠道"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="success" @click="addNewDimension">添加此维度</el-button>
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <el-button @click="dimensionDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="confirmDimensionSetting">
+          确 定
+        </el-button>
+      </template>
+    </el-dialog>
+
+    <div ref="chartRef" style="width: 100%; height: 400px; margin-top: 20px;"></div>
   </div>
 </template>
 
