@@ -14,7 +14,6 @@ const urlTableData = ref([
 
 // 交易数据（Pod 维度）
 const podTableData = ref([
-  { trans_type: "pod-1", trans_count: 150, succ_count: 8, resp_time: 220, succ_p: 0.97 },
   { trans_type: "pod-2", trans_count: 180, succ_count: 6, resp_time: 190, succ_p: 0.98 },
   { trans_type: "pod-3", trans_count: 150, succ_count: 8, resp_time: 220, succ_p: 0.97 },
   { trans_type: "pod-4", trans_count: 180, succ_count: 6, resp_time: 190, succ_p: 0.98 },
