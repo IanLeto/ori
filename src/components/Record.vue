@@ -119,7 +119,7 @@ const resetForm = () => {
       <el-input v-model="form.title" />
     </el-form-item>
 
-    <el-form-item label="体重">
+    <el-form-item label="质量">
       <el-input-number v-model="form.weight" :min="0" />
     </el-form-item>
 
