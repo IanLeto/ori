@@ -8,17 +8,17 @@ const createTransInfo = ref({
   cluster: '',
   trans_type: {
     '0922': {
-      name: '存量信贷信息',
+      name: 'payment/v1-存量信贷信息',
       service_codes: ['poin', 'credit'],
       custom_dimensions: [] // 添加自定义维度数组
     },
     '0923': {
-      name: '信用评估',
+      name: 'auth/v1-信用评估',
       service_codes: ['credit', 'risk'],
       custom_dimensions: []
     },
     '0924': {
-      name: '风险分析',
+      name: 'edsp/pya',
       service_codes: ['risk', 'poin'],
       custom_dimensions: []
     }
@@ -50,7 +50,7 @@ const tableData = ref([
   }
 ])
 
-// 服务编码映射
+// 业务返回码映射
 const serviceCodeMap = reactive({
   'poin': 'AAAAA',
   'credit': 'S-ffF',
@@ -70,9 +70,9 @@ const currentAlarmTransType = ref('')
 const alarmThreshold = ref(0.9)
 const alarmDescription = ref('')
 
-// 服务编码编辑相关状态
+// 业务返回码编辑相关状态
 const editingRow = ref(null) // 正在编辑的行
-const newServiceCode = ref('') // 新添加的服务编码
+const newServiceCode = ref('') // 新添加的业务返回码
 
 // 按trans_type维度处理数据
 const transTypeStatistics = computed(() => {
@@ -145,13 +145,13 @@ const confirmAlarmSetting = () => {
   alarmDialogVisible.value = false
 }
 
-// 开始编辑服务编码
+// 开始编辑业务返回码
 const startEditServiceCodes = (row) => {
   editingRow.value = row;
   newServiceCode.value = '';
 }
 
-// 结束编辑服务编码
+// 结束编辑业务返回码
 const endEditServiceCodes = () => {
   // 更新 createTransInfo 中的配置
   if (editingRow.value && editingRow.value.trans_type) {
@@ -169,7 +169,7 @@ const endEditServiceCodes = () => {
   editingRow.value = null;
 }
 
-// 删除服务编码
+// 删除业务返回码
 const removeServiceCode = (row, code) => {
   const index = row.service_codes.indexOf(code);
   if (index > -1) {
@@ -177,15 +177,15 @@ const removeServiceCode = (row, code) => {
   }
 }
 
-// 添加服务编码
+// 添加业务返回码
 const addServiceCode = (row) => {
   if (!newServiceCode.value) {
-    ElMessage.warning('请输入服务编码');
+    ElMessage.warning('请输入业务返回码');
     return;
   }
 
   if (!row.service_codes.includes(newServiceCode.value)) {
-    // 如果添加的服务编码不在映射表中，自动添加
+    // 如果添加的业务返回码不在映射表中，自动添加
     if (!serviceCodeMap[newServiceCode.value]) {
       serviceCodeMap[newServiceCode.value] = newServiceCode.value;
     }
@@ -193,7 +193,7 @@ const addServiceCode = (row) => {
     row.service_codes.push(newServiceCode.value);
     newServiceCode.value = '';
   } else {
-    ElMessage.warning('该服务编码已存在');
+    ElMessage.warning('该业务返回码已存在');
   }
 }
 
@@ -326,7 +326,7 @@ onMounted(initChart)
         </template>
       </el-table-column>
 
-      <el-table-column label="服务编码" min-width="380">
+      <el-table-column label="业务返回码" min-width="380">
         <template #default="scope">
           <div v-if="editingRow && editingRow.trans_type === scope.row.trans_type">
             <!-- 编辑模式 -->
@@ -345,7 +345,7 @@ onMounted(initChart)
             <div style="display: flex; align-items: center;">
               <el-input
                   v-model="newServiceCode"
-                  placeholder="输入服务编码"
+                  placeholder="输入业务返回码"
                   style="width: 150px; margin-right: 10px;"
                   @keyup.enter="addServiceCode(editingRow)"
               ></el-input>
@@ -396,13 +396,13 @@ onMounted(initChart)
       <el-table-column label="交易总数" prop="total_transactions" width="120">
       </el-table-column>
 
-      <el-table-column label="成功率" width="120">
-        <template #default="scope">
-          <el-tag :type="scope.row.success_rate > 0.9 ? 'success' : 'danger'">
-            {{ (scope.row.success_rate * 100).toFixed(2) }}%
-          </el-tag>
-        </template>
-      </el-table-column>
+<!--      <el-table-column label="成功率" width="120">-->
+<!--        <template #default="scope">-->
+<!--          <el-tag :type="scope.row.success_rate > 0.9 ? 'success' : 'danger'">-->
+<!--            {{ (scope.row.success_rate * 100).toFixed(2) }}%-->
+<!--          </el-tag>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
 
       <el-table-column label="操作" width="200">
         <template #default="scope">
