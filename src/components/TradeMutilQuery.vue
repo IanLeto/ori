@@ -76,12 +76,12 @@ const handleRowClick = (row) => {
 
     <!-- 选择维度 -->
     <el-radio-group v-model="selectedDimension">
-      <el-radio label="1">接口路径 URL</el-radio>
-      <el-radio label="2">上一条</el-radio>
+      <el-radio label="1">接口路径URL</el-radio>
+      <el-radio label="2">上一跳</el-radio>
       <el-radio label="3">第一跳</el-radio>
       <el-radio label="2">返回码</el-radio>
       <el-radio label="2">服务名</el-radio>
-      <el-radio label="2">原地址</el-radio>
+      <el-radio label="2">源地址</el-radio>
       <el-radio label="2">端地址</el-radio>
       <el-radio label="2">自定义1</el-radio>
       <el-radio label="2">自定义2</el-radio>
